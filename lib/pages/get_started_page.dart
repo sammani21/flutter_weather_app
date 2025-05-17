@@ -20,27 +20,28 @@ class _GetStartedPageState extends State<GetStartedPage>
   double _currentPageValue = 0.0;
 
   final List<OnboardingContent> _contents = [
-    OnboardingContent(
-      title: 'Track Hourly\nForecast',
-      description: 'Access accurate hourly updates\nwith detailed insights.',
-      image: 'assets/images/getStart1.png',
-    ),
-    OnboardingContent(
-      title: 'Live Weather Map',
-      description: 'Visualize rainfall and wind\nin real-time easily.',
-      image: 'assets/images/getStart2.png',
-    ),
-    OnboardingContent(
-      title: 'Global Locations',
-      description: 'Add multiple cities & swipe\nbetween them smoothly.',
-      image: 'assets/images/getStart3.png',
-    ),
-    OnboardingContent(
-      title: 'Plan Confidently',
-      description: 'Be ready for any weather\nwith advanced alerts.',
-      image: 'assets/images/getStart4.png',
-    ),
-  ];
+  OnboardingContent(
+    title: 'Your Weather, Hour by Hour',
+    description: 'Plan every moment with\npinpoint hourly forecasts.',
+    image: 'assets/images/getStart1.png',
+  ),
+  OnboardingContent(
+    title: 'The Sky, Visualized',
+    description: 'Track storms, breezes,\nand rainfall as they happen.',
+    image: 'assets/images/getStart2.png',
+  ),
+  OnboardingContent(
+    title: 'Wherever You Roam',
+    description: 'Add cities you love and\nswipe through with ease.',
+    image: 'assets/images/getStart3.png',
+  ),
+  OnboardingContent(
+    title: 'Always One Step Ahead',
+    description: 'Get advanced alerts to\nprepare for what’s next.',
+    image: 'assets/images/getStart4.png',
+  ),
+];
+
 
   @override
   void initState() {

@@ -7,6 +7,10 @@ import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+// Import the reusable components
+import 'components/today_info.dart';
+import 'components/hourly_forecast_item.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -210,44 +214,19 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Color _getWeatherColor(String? weatherMain) {
-    switch (weatherMain?.toLowerCase()) {
-      case 'clear':
-        return const Color(0xFF1E88E5); // Bright ocean blue
-      case 'clouds':
-        return const Color(0xFF1976D2); // Medium ocean blue
-      case 'rain':
-        return const Color(0xFF1565C0); // Deep ocean blue
-      case 'snow':
-        return const Color(0xFF0D47A1); // Dark ocean blue
-      case 'thunderstorm':
-        return const Color(0xFF0D47A1); // Dark ocean blue
-      case 'drizzle':
-        return const Color(0xFF1565C0); // Deep ocean blue
-      case 'mist':
-      case 'smoke':
-      case 'haze':
-      case 'dust':
-      case 'fog':
-        return const Color(0xFF1976D2); // Medium ocean blue
-      default:
-        return const Color(0xFF1E88E5); // Bright ocean blue
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: const Color(0xFF1E88E5).withOpacity(0.8),
+        backgroundColor: const Color(0xFF4A148C).withOpacity(0.8),
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [const Color(0xFF1E88E5), const Color(0xFF1565C0)],
+              colors: [const Color(0xFF4A148C), const Color(0xFF6A1B9A)],
             ),
           ),
         ),
@@ -326,7 +305,7 @@ class _HomePageState extends State<HomePage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [const Color(0xFF1E88E5), const Color(0xFF1565C0)],
+                colors: [const Color(0xFF4A148C), const Color(0xFF6A1B9A)],
               ),
             ),
             child:
@@ -452,15 +431,15 @@ class _HomePageState extends State<HomePage> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    _buildTodayInfo(
-                                      'Pressure',
-                                      _weather?.pressure != null
+                                    TodayInfo(
+                                      label: 'Pressure',
+                                      value: _weather?.pressure != null
                                           ? '${_weather!.pressure}mb'
                                           : '--',
                                     ),
-                                    _buildTodayInfo(
-                                      'Humidity',
-                                      _weather?.humidity != null
+                                    TodayInfo(
+                                      label: 'Humidity',
+                                      value: _weather?.humidity != null
                                           ? '${_weather!.humidity}%'
                                           : '--',
                                     ),
@@ -470,57 +449,20 @@ class _HomePageState extends State<HomePage> {
                                 // Hourly Forecast
                                 _hourlyForecast.isNotEmpty
                                     ? SizedBox(
-                                      height: 80,
-                                      child: ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        itemCount: _hourlyForecast.length,
-                                        itemBuilder: (context, index) {
-                                          final weather =
-                                              _hourlyForecast[index];
-                                          final time = DateFormat(
-                                            'HH:00',
-                                          ).format(weather.date!);
-                                          return Container(
-                                            width: 60,
-                                            margin: const EdgeInsets.only(
-                                              right: 12,
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text(
-                                                  time,
-                                                  style: const TextStyle(
-                                                    color: Colors.black54,
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 6),
-                                                Icon(
-                                                  _getWeatherIcon(
-                                                    weather.weatherMain,
-                                                  ),
-                                                  color: Colors.amber[600],
-                                                  size: 24,
-                                                ),
-                                                const SizedBox(height: 6),
-                                                Text(
-                                                  weather.temperature != null
-                                                      ? '${weather.temperature!.celsius!.round()}°'
-                                                      : '--',
-                                                  style: const TextStyle(
-                                                    color: Colors.black87,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    )
+                                        height: 80,
+                                        child: ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: _hourlyForecast.length,
+                                          itemBuilder: (context, index) {
+                                            final weather =
+                                                _hourlyForecast[index];
+                                            return HourlyForecastItem(
+                                              weather: weather,
+                                              getWeatherIcon: _getWeatherIcon,
+                                            );
+                                          },
+                                        ),
+                                      )
                                     : const SizedBox(),
                               ],
                             ),
@@ -558,21 +500,21 @@ class _HomePageState extends State<HomePage> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      _buildTodayInfo(
-                                        'Wind',
-                                        _weather!.windSpeed != null
+                                      TodayInfo(
+                                        label: 'Wind',
+                                        value: _weather!.windSpeed != null
                                             ? '${_weather!.windSpeed} m/s'
                                             : '--',
                                       ),
-                                      _buildTodayInfo(
-                                        'Wind Dir',
-                                        _weather!.windDegree != null
+                                      TodayInfo(
+                                        label: 'Wind Dir',
+                                        value: _weather!.windDegree != null
                                             ? '${_weather!.windDegree}°'
                                             : '--',
                                       ),
-                                      _buildTodayInfo(
-                                        'Feels Like',
-                                        _weather!.tempFeelsLike?.celsius != null
+                                      TodayInfo(
+                                        label: 'Feels Like',
+                                        value: _weather!.tempFeelsLike?.celsius != null
                                             ? '${_weather!.tempFeelsLike!.celsius!.round()}°'
                                             : '--',
                                       ),
@@ -583,15 +525,15 @@ class _HomePageState extends State<HomePage> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      _buildTodayInfo(
-                                        'Min Temp',
-                                        _weather!.tempMin?.celsius != null
+                                      TodayInfo(
+                                        label: 'Min Temp',
+                                        value: _weather!.tempMin?.celsius != null
                                             ? '${_weather!.tempMin!.celsius!.round()}°'
                                             : '--',
                                       ),
-                                      _buildTodayInfo(
-                                        'Max Temp',
-                                        _weather!.tempMax?.celsius != null
+                                      TodayInfo(
+                                        label: 'Max Temp',
+                                        value: _weather!.tempMax?.celsius != null
                                             ? '${_weather!.tempMax!.celsius!.round()}°'
                                             : '--',
                                       ),
@@ -602,20 +544,20 @@ class _HomePageState extends State<HomePage> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      _buildTodayInfo(
-                                        'Sunrise',
-                                        _weather!.sunrise != null
+                                      TodayInfo(
+                                        label: 'Sunrise',
+                                        value: _weather!.sunrise != null
                                             ? DateFormat('h:mm a').format(
-                                              _weather!.sunrise!.toLocal(),
-                                            )
+                                                _weather!.sunrise!.toLocal(),
+                                              )
                                             : '--',
                                       ),
-                                      _buildTodayInfo(
-                                        'Sunset',
-                                        _weather!.sunset != null
+                                      TodayInfo(
+                                        label: 'Sunset',
+                                        value: _weather!.sunset != null
                                             ? DateFormat('h:mm a').format(
-                                              _weather!.sunset!.toLocal(),
-                                            )
+                                                _weather!.sunset!.toLocal(),
+                                              )
                                             : '--',
                                       ),
                                     ],
@@ -684,67 +626,67 @@ class _HomePageState extends State<HomePage> {
                     child:
                         _isSearchingSuggestions && _searchSuggestions.isNotEmpty
                             ? ListView.builder(
-                              itemCount: _searchSuggestions.length,
-                              itemBuilder: (context, index) {
-                                final location = _searchSuggestions[index];
-                                final state =
-                                    location['state'] != null
-                                        ? ', ${location['state']}'
-                                        : '';
-                                return ListTile(
-                                  leading: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.withOpacity(0.1),
-                                      shape: BoxShape.circle,
+                                itemCount: _searchSuggestions.length,
+                                itemBuilder: (context, index) {
+                                  final location = _searchSuggestions[index];
+                                  final state =
+                                      location['state'] != null
+                                          ? ', ${location['state']}'
+                                          : '';
+                                  return ListTile(
+                                    leading: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.withOpacity(0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.location_on,
+                                        color: Colors.blue,
+                                      ),
                                     ),
-                                    child: const Icon(
-                                      Icons.location_on,
-                                      color: Colors.blue,
+                                    title: Text(
+                                      '${location['name']}$state',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                  title: Text(
-                                    '${location['name']}$state',
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
+                                    subtitle: Text(
+                                      location['country'],
+                                      style: TextStyle(
+                                        color: Colors.black.withOpacity(0.6),
+                                      ),
                                     ),
-                                  ),
-                                  subtitle: Text(
-                                    location['country'],
-                                    style: TextStyle(
-                                      color: Colors.black.withOpacity(0.6),
-                                    ),
-                                  ),
-                                  onTap: () => _searchLocation(location),
-                                );
-                              },
-                            )
+                                    onTap: () => _searchLocation(location),
+                                  );
+                                },
+                              )
                             : _searchController.text.isNotEmpty
-                            ? const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Text(
-                                  'No locations found',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
+                                ? const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(16.0),
+                                      child: Text(
+                                        'No locations found',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : const Center(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(16.0),
+                                      child: Text(
+                                        'Start typing to search locations',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            )
-                            : const Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Text(
-                                  'Start typing to search locations',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
                   ),
                 ],
               ),
@@ -754,25 +696,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildTodayInfo(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.black54, fontSize: 13),
-        ),
-      ],
-    );
-  }
+  // No longer needed:
+  // Widget _buildTodayInfo(String label, String value) { ... }
 
   IconData _getWeatherIcon(String? weatherMain) {
     switch (weatherMain?.toLowerCase()) {
